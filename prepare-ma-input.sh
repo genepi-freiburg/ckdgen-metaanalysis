@@ -2,9 +2,9 @@
 
 mkdir -p input
 
-if [ "$#" -ne "6" ]
+if [ "$#" -ne "7" ]
 then
-	echo "Usage: $0 <INPUT_FILE_LIST> <MAF_FILTER> <INFO_FILTER> <MAC_FILTER> <EFF_SAMPLE_SIZE> <BETA_FILTER>"
+	echo "Usage: $0 <INPUT_FILE_LIST> <MAF_FILTER> <INFO_FILTER> <MAC_FILTER> <EFF_SAMPLE_SIZE> <BETA_FILTER> <INDEL_REMOVAL>"
 	exit 3
 fi
 
@@ -14,6 +14,7 @@ INFO_FILTER=$3
 MAC_FILTER=$4
 EFF_SAMPLE_SIZE=$5
 BETA_FILTER=$6
+INDEL_REMOVAL=$7
 
 if [ ! -f "$INPUT_FILE_LIST" ]
 then
@@ -38,7 +39,13 @@ echo "INFO filter: >= $INFO_FILTER"
 echo "MAC (minor allele count) filter: >= $MAC_FILTER"
 echo "Effective sample size filter: >= $EFF_SAMPLE_SIZE"
 echo "BETA filter: > -${BETA_FILTER} && < ${BETA_FILTER}"
+echo "INDEL removal: $INDEL_REMOVAL"
 
+if [ "$INDEL_REMOVAL" != "1" ] && [ "$INDEL_REMOVAL" != "0" ]
+then
+	echo "INDEL removal must be '0' (off) or '1' (on)."
+	exit 3
+fi
 
 ERRORS=`awk -v maf=$MAF_FILTER -v info=$INFO_FILTER -v mac=$MAC_FILTER -v eff=$EFF_SAMPLE_SIZE -v beta=$BETA_FILTER \
 	'BEGIN { 
@@ -100,6 +107,7 @@ do
 	OUTFN=`basename $FN`
 	echo "Process $FN ==> input/$OUTFN"
 	zcat $FN | awk -v mafFilter=$MAF_FILTER -v infoFilter=$INFO_FILTER -v macFilter=$MAC_FILTER -v effFilter=$EFF_SAMPLE_SIZE -v betaFilter=$BETA_FILTER \
+		-v indelRemove=$INDEL_REMOVAL \
 		-v snpCol=$SNP_COL -v chrCol=$CHR_COL -v posCol=$POS_COL -v refAllCol=$REF_ALL_COL -v codedAllCol=$CODED_ALL_COL \
 		-v afCol=$AF_COL -v infoCol=$INFO_COL -v nCol=$N_COL \
 		-v betaCol=$BETA_COL -v seCol=$SE_COL -v pvalCol=$PVAL_COL \
@@ -120,9 +128,13 @@ do
 				mac = 2 * maf * n;
 				n_eff = n * info;
 				beta = $(betaCol+1);
+				marker = $(snpCol+1);
+				if (indelRemove == 1 && marker ~ /_I$/) {
+					next;
+				}
 				if (beta > -betaFilter && beta < betaFilter && maf >= mafFilter &&
 				    info >= infoFilter && mac >= macFilter && n_eff >= effFilter) {
-					print $(snpCol+1), $(chrCol+1), $(posCol+1), $(codedAllCol+1), $(refAllCol+1),
+					print marker, $(chrCol+1), $(posCol+1), $(codedAllCol+1), $(refAllCol+1),
 					      af, maf, mac, n, n_eff, info, beta, $(seCol+1), $(pvalCol+1);
 				}
 			}
