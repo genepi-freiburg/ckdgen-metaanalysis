@@ -1,0 +1,35 @@
+MARKER   MARKER
+WEIGHT   n_total
+ALLELE   coded_all noncoded_all
+FREQ     AF_coded_all
+EFFECT   beta
+STDERR   SE
+PVAL     pval
+
+AVERAGEFREQ ON
+MINMAXFREQ ON
+SCHEME STDERR
+
+ADDFILTER Se > 0
+ADDFILTER chr < 23
+ADDFILTER AF_coded_all > 0
+ADDFILTER AF_coded_all < 1
+
+CUSTOMVARIABLE n_total
+CUSTOMVARIABLE mac
+
+OUTFILE output/eGFRcrea_overall_EA_20170213 .tbl
+
+# HRC
+PROCESS input/INGI_FVG_EA_eGFR_overall_HRC_20161103.single.q.emmax.gwas.gz
+PROCESS input/OGP_EA_eGFR_overall_HRC_20161028.gwas.gz
+PROCESS input/INGI_VBI_EA_eGFR_overall_HRC_20161103.single.q.emmax.gwas.gz
+PROCESS input/INGI_CARL_EA_eGFR_overall_HRC_20161103.single.q.emmax.gwas.gz
+
+# 1KGP
+PROCESS input/NEO_EA_eGFR_overall_1KGP2011v3_chr1-22_20092016.gwas.gz
+PROCESS input/Sorbs_EA_eGFR_overall_1KGPph3v5_autosomes_20161129.gwas.gz
+ 
+ANALYZE HETEROGENEITY
+QUIT
+
