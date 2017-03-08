@@ -19,6 +19,16 @@ do
 	if [ "$MYPATH" == "" ]
 	then
 		echo "NOT FOUND!!"
+
+		echo "Try under /shared/cleaning"
+	        MYPATH=`find /shared/cleaning -type f -name "${FN}*" | grep "combined" | grep "gz$"`
+	        if [ "$MYPATH" == "" ]
+	        then
+        	        echo "NOT FOUND AGAIN!!"
+		else
+		        echo $MYPATH
+        	        echo $MYPATH >> $2
+		fi
 	else
 		echo $MYPATH
 		echo $MYPATH >> $2
