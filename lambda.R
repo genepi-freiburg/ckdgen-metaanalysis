@@ -1,5 +1,7 @@
 args = commandArgs(trailingOnly=T)
 data = read.table(args[1], h=T)
+
+#data$pval = as.numeric(data$pval)
 summary(data)
 
 print(paste("row count:", nrow(data)))

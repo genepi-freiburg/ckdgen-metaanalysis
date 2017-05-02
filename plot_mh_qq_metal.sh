@@ -20,6 +20,8 @@ else
         echo "Use default NSTUD filter: $NSTUD"
 fi
 
+OUT=${FN}_nstud${NSTUD}.epacts
+
 cat $FN | awk -v nstud_filter=$NSTUD '{ 
 	if (FNR > 1) {
 		marker = $1;
@@ -37,6 +39,6 @@ cat $FN | awk -v nstud_filter=$NSTUD '{
 		}
 	} else {
 		print "#CHR", "BEGIN", "END", "MAF", "PVALUE";
-	} }' > ${FN}.epacts
+	} }' > ${OUT}
 
-/shared/metaanalysis/bin/EPACTS-3.2.6/bin/epacts-plot -in ${FN}.epacts
+/shared/metaanalysis/bin/EPACTS-3.2.6/bin/epacts-plot -in ${OUT}

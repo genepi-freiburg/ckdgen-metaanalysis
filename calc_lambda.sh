@@ -21,16 +21,20 @@ else
 fi
 
 
-cat $FN | awk -v nstud_filter=$NSTUD '{ 
+OUTFN=${FN}_nstud${NSTUD}.pval
+rm -fv ${OUTFN}
+
+cat $FN | awk -F $'\t' -v nstud_filter=$NSTUD 'BEGIN {OFS = FS} { 
 	if (FNR > 1) {
 		pval = $10;
 		isq = $12;
 		nstud = $14 + 1;
 		if (nstud >= nstud_filter) {
-			print pval, $11;
+			gsub(/ /, "", pval);
+			print pval, $1;
 		}
 	} else {
-		print "pval", "directions";
-	} }' > ${FN}.pval
+		print "pval", "ID";
+	} }' > ${OUTFN}
 
-Rscript /shared/metaanalysis/scripts/lambda.R ${FN}.pval
+Rscript /shared/metaanalysis/scripts/lambda.R ${OUTFN}
