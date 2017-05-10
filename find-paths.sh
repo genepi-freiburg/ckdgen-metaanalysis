@@ -18,13 +18,13 @@ do
 	MYPATH=`find /storage/cleaning-finished -type f -name "${FN}*" | grep "combined" | grep "gz$"`
 	if [ "$MYPATH" == "" ]
 	then
-		echo "NOT FOUND!!"
+		echo "NOT FOUND in /storage/cleaning-finished => try /shared/cleaning"
 
 		echo "Try under /shared/cleaning"
 	        MYPATH=`find /shared/cleaning -type f -name "${FN}*" | grep "combined" | grep "gz$"`
 	        if [ "$MYPATH" == "" ]
 	        then
-        	        echo "NOT FOUND AGAIN!!"
+        	        echo "NOT FOUND in both locations => FILE MISSING!!"
 		else
 		        echo $MYPATH
         	        echo $MYPATH >> $2

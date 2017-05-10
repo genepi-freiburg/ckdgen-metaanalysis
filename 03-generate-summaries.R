@@ -142,6 +142,7 @@ par(mfrow=c(1,1))
 tblPlot=data.frame(
 	study=d$STUDY_NAME,
 	medianSE=d$SE_MEDIAN,
+	medianBeta=d$BETA_MEDIAN,
 	n_total=d$N_TOTAL)
 
 tblPlot$medianSE_rez=(1/tblPlot$medianSE)
@@ -204,5 +205,13 @@ par(mar=(c(5,6,6,1)))
 plot(x=tblPlot$n_total_sqrt, y=tblPlot$medianSE_rez2,xlab="Sqrt(Number of Subjects)", ylab="1/(median(SE))^2",cex.axis=2,cex=2,cex.lab=2,pch=21,bg="black")
 text(x=tblPlot$n_total_sqrt, y=tblPlot$medianSE_rez2,labels=tblPlot$study,pos=3)
 abline(intercept,incline,col="red",lty=2)
+
+
+
+par(mar=(c(5,6,6,1)))
+plot(x=abs(tblPlot$medianBeta), y=tblPlot$medianSE, xlab="abs(median(beta))", ylab="median(SE)", cex.axis=2,cex=2,cex.lab=2,pch=21,bg="black")
+text(x=abs(tblPlot$medianBeta), y=tblPlot$medianSE, labels=tblPlot$study,pos=3)
+
+
 dev.off()
 

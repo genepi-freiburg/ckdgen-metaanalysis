@@ -4,5 +4,5 @@ then
 	exit 3
 fi
 
-/shared/metaanalysis/scripts/prepare-ma-input.sh $1 0 0.3 1 10 100 1
+/shared/metaanalysis/scripts/prepare-ma-input.sh $1 0 0.3 1 100 10 1
 
