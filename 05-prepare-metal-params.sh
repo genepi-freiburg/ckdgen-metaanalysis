@@ -21,4 +21,6 @@ echo >> $MYFILE
 echo "ANALYZE HETEROGENEITY" >> $MYFILE
 echo "QUIT" >> $MYFILE
 
+mkdir -p output
+
 echo "done"
