@@ -140,7 +140,7 @@ echo -n "$IQ_SD	"
 echo -n "$IQ_MIN	"
 echo -n "$IQ_MAX	"
 echo -n "$IQ_Q1	"
-echo -n "$IQ_Q3	"
+echo -n "$IQ_Q3"
 echo
 
 >&2 echo DONE: $BN

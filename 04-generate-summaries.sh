@@ -34,5 +34,6 @@ echo "Collect summaries"
 echo "=============================================="
 
 $SCRIPTS/collect-summaries.sh
+Rscript $SCRIPTS/generate-summaries.R
 
 echo "Done."

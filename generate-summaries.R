@@ -15,13 +15,18 @@ input_paths = read.table("input-files-with-path.txt", h=F)
 colnames(input_paths) = c("FILE_PATH")
 input_paths$FILE_PATH = as.character(input_paths$FILE_PATH)
 
+summary(input_files)
+summary(input_paths)
+
 if (nrow(input_paths) != nrow(input_files)) {
 	print("ERROR: file names and paths not same size")
+	print(nrow(input_paths))
+	print(nrow(input_files))
+        print((input_paths))
+        print((input_files))
 	stop()
 }
 
-summary(input_files)
-summary(input_paths)
 input = cbind(input_files, input_paths)
 summary(input)
 print("number of input rows")
@@ -32,7 +37,7 @@ for (i in 1:nrow(input)) {
 	print(paste("process", i, fn))
 	segs = unlist(strsplit(fn, "/"))
 	parent_dir = paste(segs[1:(length(segs)-2)], collapse='/')
-	summary_file = paste(parent_dir, "11_summaries.txt", sep="/")
+	summary_file = "gwasqc_summaries.txt"
 	print(paste("summary file:", summary_file))
 	if (!file.exists(summary_file)) {
 		print(paste("ERROR: summary file does not exist for study file:", input[i, "FILE_NAME"]))
@@ -45,6 +50,8 @@ for (i in 1:nrow(input)) {
 
 	summaries_table = read.table(summary_file, h=T, sep="\t")
 	summary(summaries_table) # will fail if strange things happened
+
+	input[i, "FILE_NAME"] = gsub(".gwas", ".gwas.gz", input[i, "FILE_NAME"])
 
 	summary_row_idx = which(summaries_table$File.Name == input[i, "FILE_NAME"])
 	if (length(summary_row_idx) == 0) {
