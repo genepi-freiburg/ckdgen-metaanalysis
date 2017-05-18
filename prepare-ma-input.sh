@@ -1,10 +1,8 @@
 #!/bin/bash
 
-mkdir -p input
-
-if [ "$#" -ne "7" ]
+if [[ "$#" -lt "7" ]] || [[ "$#" -gt "8" ]]
 then
-	echo "Usage: $0 <INPUT_FILE_LIST> <MAF_FILTER> <INFO_FILTER> <MAC_FILTER> <EFF_SAMPLE_SIZE> <BETA_FILTER> <INDEL_REMOVAL>"
+	echo "Usage: $0 <INPUT_FILE_LIST> <MAF_FILTER> <INFO_FILTER> <MAC_FILTER> <EFF_SAMPLE_SIZE> <BETA_FILTER> <INDEL_REMOVAL> [<OUTDIR>]"
 	exit 3
 fi
 
@@ -15,6 +13,7 @@ MAC_FILTER=$4
 EFF_SAMPLE_SIZE=$5
 BETA_FILTER=$6
 INDEL_REMOVAL=$7
+OUTDIR=$8
 
 if [ ! -f "$INPUT_FILE_LIST" ]
 then
@@ -33,6 +32,12 @@ do
 	I=$((I+1))
 done
 
+if [ "$OUTDIR" == "" ]
+then
+	OUTDIR="input"
+fi
+mkdir -p $OUTDIR
+
 echo "Input file list: $INPUT_FILE_LIST (has $I files)"
 echo "MAF filter: >= $MAF_FILTER"
 echo "INFO filter: >= $INFO_FILTER"
@@ -40,6 +45,7 @@ echo "MAC (minor allele count) filter: >= $MAC_FILTER"
 echo "Effective sample size filter: >= $EFF_SAMPLE_SIZE"
 echo "BETA filter: > -${BETA_FILTER} && < ${BETA_FILTER}"
 echo "INDEL removal: $INDEL_REMOVAL"
+echo "OUTDIR: $OUTDIR"
 
 if [ "$INDEL_REMOVAL" != "1" ] && [ "$INDEL_REMOVAL" != "0" ]
 then
@@ -138,5 +144,5 @@ do
 					      af, maf, mac, n, n_eff, info, beta, $(seCol+1), $(pvalCol+1);
 				}
 			}
-		}' | gzip > input/$OUTFN
+		}' | gzip > $OUTDIR/$OUTFN
 done
