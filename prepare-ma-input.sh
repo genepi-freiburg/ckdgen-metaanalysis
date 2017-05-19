@@ -111,7 +111,7 @@ do
 
 	# filter file
 	OUTFN=`basename $FN`
-	echo "Process $FN ==> input/$OUTFN"
+	echo "Process $FN ==> $OUTDIR/$OUTFN"
 	zcat $FN | awk -v mafFilter=$MAF_FILTER -v infoFilter=$INFO_FILTER -v macFilter=$MAC_FILTER -v effFilter=$EFF_SAMPLE_SIZE -v betaFilter=$BETA_FILTER \
 		-v indelRemove=$INDEL_REMOVAL \
 		-v snpCol=$SNP_COL -v chrCol=$CHR_COL -v posCol=$POS_COL -v refAllCol=$REF_ALL_COL -v codedAllCol=$CODED_ALL_COL \
