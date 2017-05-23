@@ -27,6 +27,8 @@ if (nrow(input_paths) != nrow(input_files)) {
 	stop()
 }
 
+lambdas = read.table("lambdas_input_HQ.txt", h=T)
+
 input = cbind(input_files, input_paths)
 summary(input)
 print("number of input rows")
@@ -62,16 +64,27 @@ for (i in 1:nrow(input)) {
 	print(paste("summary row index:", summary_row_idx))
 	summary_row = summaries_table[summary_row_idx,]
 
+	lambda_row_idx = which(lambdas$FILE == input[i, "FILE_NAME"])
+	if (length(lambda_row_idx) == 0) {
+		print(paste("ERROR: lambda file does not have a row for file:", input[i, "FILE_NAME"]))
+		print("WARNING - FILE WILL BE SKIPPED - NA PRODUCED")
+		next
+	}
+	lambda = lambdas[lambda_row_idx, "LAMBDA"]
+	print(paste("got lambda:", lambda))
+
 	input[i, "N_TOTAL"] = summary_row["N.total"]
 	input[i, "N_ROWS"] = summary_row["N.rows"]
 	input[i, "BETA_MEDIAN"] = summary_row["Beta_MEDIAN"]
 #	input[i, "BETA_SD"] = summary_row["Beta_SD"]
 	input[i, "BETA_Q1"] = summary_row["Beta_Q1"]
 	input[i, "BETA_Q3"] = summary_row["Beta_Q3"]
+	input[i, "BETA_Skewness"] = summary_row["Beta_Skewness"]
 	input[i, "SE_MEDIAN"] = summary_row["SE_MEDIAN"]
 #	input[i, "SE_SD"] = summary_row["SE_SD"]
 	input[i, "SE_Q1"] = summary_row["SE_Q1"]
 	input[i, "SE_Q3"] = summary_row["SE_Q3"]
+	input[i, "SE_Skewness"] = summary_row["SE_Skewness"]
 	input[i, "PVAL_MIN"] = summary_row["PVAL_MIN"]
 	input[i, "PVAL_MEAN"] = summary_row["PVAL_MEAN"]
 	input[i, "PVAL_MAX"] = summary_row["PVAL_MAX"]
@@ -85,7 +98,7 @@ for (i in 1:nrow(input)) {
 	input[i, "IQ_SD"] = summary_row["IQ_SD"]
 	input[i, "IQ_Q1"] = summary_row["IQ_Q1"]
 	input[i, "IQ_Q3"] = summary_row["IQ_Q3"]
-
+	input[i, "LAMBDA_HQ"] = lambda
 }
 
 print("SUMMARY OF SUMMARY")
@@ -94,57 +107,79 @@ write.table(input, "input-summary.txt", sep="\t", row.names=F, col.names=T, quot
 
 d = subset(input, !is.na(input$N_TOTAL))
 pdf("input-summary.pdf",width=14,height=14)
+source("/shared/metaanalysis/scripts/boxplot.with.outlier.label.r")
 
+################################
+# N
+################################
 par(mfrow = c(1, 2), oma=c(0,0,2,0))
-boxplot(d$N_TOTAL)
-boxplot(d$N_ROWS)
+boxplot.with.outlier.label(d$N_TOTAL, d$STUDY_NAME, spread_text=F)
+boxplot.with.outlier.label(d$N_ROWS, d$STUDY_NAME, spread_text=F)
 title("n(participants), n(variants)", outer=T)
 
-par(mfrow = c(1, 3), oma=c(0,0,2,0))
-boxplot(d$BETA_MEDIAN)
-#boxplot(d$BETA_MEAN)
-#boxplot(d$BETA_SD)
-boxplot(d$BETA_Q1)
-boxplot(d$BETA_Q3)
-title("beta (median/q1/q3)", outer=T)
+################################
+# BETA
+################################
+par(mfrow = c(1, 4), oma=c(0,0,2,0))
+boxplot.with.outlier.label(d$BETA_MEDIAN, d$STUDY_NAME, spread_text=F)
+#boxplot.with.outlier.label(d$BETA_MEAN, d$STUDY_NAME, spread_text=F)
+#boxplot.with.outlier.label(d$BETA_SD, d$STUDY_NAME, spread_text=F)
+boxplot.with.outlier.label(d$BETA_Q1, d$STUDY_NAME, spread_text=F)
+boxplot.with.outlier.label(d$BETA_Q3, d$STUDY_NAME, spread_text=F)
+boxplot.with.outlier.label(d$BETA_Skewness, d$STUDY_NAME, spread_text=F)
+title("beta (median/q1/q3/Skewness)", outer=T)
 
-par(mfrow = c(1, 3), oma=c(0,0,2,0))
-boxplot(d$SE_MEDIAN)
-#boxplot(d$SE_MEAN)
-#boxplot(d$SE_SD)
-boxplot(d$SE_Q1)
-boxplot(d$SE_Q3)
-title("SE (median/q1/q3)", outer=T)
+################################
+# SE
+################################
+par(mfrow = c(1, 4), oma=c(0,0,2,0))
+boxplot.with.outlier.label(d$SE_MEDIAN, d$STUDY_NAME, spread_text=F)
+#boxplot.with.outlier.label(d$SE_MEAN, d$STUDY_NAME, spread_text=F)
+#boxplot.with.outlier.label(d$SE_SD, d$STUDY_NAME, spread_text=F)
+boxplot.with.outlier.label(d$SE_Q1, d$STUDY_NAME, spread_text=F)
+boxplot.with.outlier.label(d$SE_Q3, d$STUDY_NAME, spread_text=F)
+boxplot.with.outlier.label(d$SE_Skewness, d$STUDY_NAME, spread_text=F)
+title("SE (median/q1/q3/skewness)", outer=T)
 
+################################
+# PVAL
+################################
 par(mfrow = c(1, 3), oma=c(0,0,2,0))
-#boxplot(d$PVAL_N)
-#boxplot(d$PVAL_SD)
-boxplot(d$PVAL_MIN)
-boxplot(d$PVAL_MEAN)
-boxplot(d$PVAL_MAX)
+#boxplot.with.outlier.label(d$PVAL_N, d$STUDY_NAME, spread_text=F)
+#boxplot.with.outlier.label(d$PVAL_SD, d$STUDY_NAME, spread_text=F)
+boxplot.with.outlier.label(d$PVAL_MIN, d$STUDY_NAME, spread_text=F)
+boxplot.with.outlier.label(d$PVAL_MEAN, d$STUDY_NAME, spread_text=F)
+boxplot.with.outlier.label(d$PVAL_MAX, d$STUDY_NAME, spread_text=F)
 title("pvalue (min/mean/max)", outer=T)
 
+################################
+# AF
+################################
 par(mfrow = c(1, 5), oma=c(0,0,2,0))
-boxplot(d$AF_MEDIAN)
-boxplot(d$AF_MEAN)
-boxplot(d$AF_SD)
-boxplot(d$AF_Q1)
-boxplot(d$AF_Q3)
+boxplot.with.outlier.label(d$AF_MEDIAN, d$STUDY_NAME, spread_text=F)
+boxplot.with.outlier.label(d$AF_MEAN, d$STUDY_NAME, spread_text=F)
+boxplot.with.outlier.label(d$AF_SD, d$STUDY_NAME, spread_text=F)
+boxplot.with.outlier.label(d$AF_Q1, d$STUDY_NAME, spread_text=F)
+boxplot.with.outlier.label(d$AF_Q3, d$STUDY_NAME, spread_text=F)
 title("AF_coded_all (median/mean/sd/q1/q3)", outer=T)
 
+################################
+# IQ
+################################
 par(mfrow = c(1, 5), oma=c(0,0,2,0))
-boxplot(d$IQ_MEDIAN)
-boxplot(d$IQ_MEAN)
-boxplot(d$IQ_SD)
-boxplot(d$IQ_Q1)
-boxplot(d$IQ_Q3)
+boxplot.with.outlier.label(d$IQ_MEDIAN, d$STUDY_NAME, spread_text=F)
+boxplot.with.outlier.label(d$IQ_MEAN, d$STUDY_NAME, spread_text=F)
+boxplot.with.outlier.label(d$IQ_SD, d$STUDY_NAME, spread_text=F)
+boxplot.with.outlier.label(d$IQ_Q1, d$STUDY_NAME, spread_text=F)
+boxplot.with.outlier.label(d$IQ_Q3, d$STUDY_NAME, spread_text=F)
 title("IQ (median/mean/sd/q1/q3)", outer=T)
 
-
+################################
+# Lambda
+################################
 par(mfrow=c(1,1))
-#dev.off()
-
-# MG plots
+boxplot.with.outlier.label(d$LAMBDA, d$STUDY_NAME, spread_text=F)
+title("Lambda", outer=T)
 
 tblPlot=data.frame(
 	study=d$STUDY_NAME,
@@ -155,69 +190,57 @@ tblPlot=data.frame(
 tblPlot$medianSE_rez=(1/tblPlot$medianSE)
 tblPlot$medianSE_rez2=(tblPlot$medianSE_rez**2)
 tblPlot$n_total_sqrt=sqrt(tblPlot$n_total)
-print(tblPlot)
 
-# get coeffcients of the linear model
+################################
+# 1/MEDIAN(SE)_SQRT(N)_PLOT
+################################
 linearModel=lm("medianSE_rez~n_total_sqrt",tblPlot)
 intercept=as.numeric(linearModel$coefficients[1])
 incline=as.numeric(linearModel$coefficients[2])
-
-# # finally do the plot
-#outfilename="Scatterplot_sqrtN_SE.png"
-#png(outfilename,1000,1000)
 par(mar=(c(5,6,6,1)))
 plot(x=tblPlot$n_total_sqrt, y=tblPlot$medianSE_rez,xlab="Sqrt(Number of Subjects)", ylab="1/median(SE)",cex.axis=2,cex=2,cex.lab=2,pch=21,bg="black")
 text(x=tblPlot$n_total_sqrt, y=tblPlot$medianSE_rez,labels=tblPlot$study,pos=3)
 abline(intercept,incline,col="red",lty=2)
-#dev.off()
 
+################################
+# 1/MEDIAN(SE)_N_PLOT
+################################
+#linearModel=lm("medianSE_rez~n_total",tblPlot)
+#intercept=as.numeric(linearModel$coefficients[1])
+#incline=as.numeric(linearModel$coefficients[2])
+#par(mar=(c(5,6,6,1)))
+#plot(x=tblPlot$n_total, y=tblPlot$medianSE_rez,xlab="Number of Subjects", ylab="1/median(SE)",cex.axis=2,cex=2,cex.lab=2,pch=21,bg="black")
+#text(x=tblPlot$n_total, y=tblPlot$medianSE_rez,labels=tblPlot$study,pos=3)
+#abline(intercept,incline,col="red",lty=2)
 
-# get coeffcients of the linear model
-linearModel=lm("medianSE_rez~n_total",tblPlot)
-intercept=as.numeric(linearModel$coefficients[1])
-incline=as.numeric(linearModel$coefficients[2])
+################################
+# 1/MEDIAN(SE)^2_N_PLOT
+################################
+#linearModel=lm("medianSE_rez2~n_total",tblPlot)
+#intercept=as.numeric(linearModel$coefficients[1])
+#incline=as.numeric(linearModel$coefficients[2])
+#par(mar=(c(5,6,6,1)))
+#plot(x=tblPlot$n_total, y=tblPlot$medianSE_rez2,xlab="Number of Subjects", ylab="1/(median(SE))^2",cex.axis=2,cex=2,cex.lab=2,pch=21,bg="black")
+#text(x=tblPlot$n_total, y=tblPlot$medianSE_rez2,labels=tblPlot$study,pos=3)
+#abline(intercept,incline,col="red",lty=2)
 
+################################
+# 1/MEDIAN(SE)^2_SQRT(N)_PLOT
+################################
+#linearModel=lm("medianSE_rez2~n_total_sqrt",tblPlot)
+#intercept=as.numeric(linearModel$coefficients[1])
+#incline=as.numeric(linearModel$coefficients[2])
+#par(mar=(c(5,6,6,1)))
+#plot(x=tblPlot$n_total_sqrt, y=tblPlot$medianSE_rez2,xlab="Sqrt(Number of Subjects)", ylab="1/(median(SE))^2",cex.axis=2,cex=2,cex.lab=2,pch=21,bg="black")
+#text(x=tblPlot$n_total_sqrt, y=tblPlot$medianSE_rez2,labels=tblPlot$study,pos=3)
+#abline(intercept,incline,col="red",lty=2)
 
-#outfilename="Scatterplot_N_SE.png"
-#png(outfilename,1000,1000)
-par(mar=(c(5,6,6,1)))
-plot(x=tblPlot$n_total, y=tblPlot$medianSE_rez,xlab="Number of Subjects", ylab="1/median(SE)",cex.axis=2,cex=2,cex.lab=2,pch=21,bg="black")
-text(x=tblPlot$n_total, y=tblPlot$medianSE_rez,labels=tblPlot$study,pos=3)
-abline(intercept,incline,col="red",lty=2)
-#dev.off()
-
-# get coeffcients of the linear model
-linearModel=lm("medianSE_rez2~n_total",tblPlot)
-intercept=as.numeric(linearModel$coefficients[1])
-incline=as.numeric(linearModel$coefficients[2])
-
-#outfilename="Scatterplot_N_SE2.png"
-#png(outfilename,1000,1000)
-par(mar=(c(5,6,6,1)))
-plot(x=tblPlot$n_total, y=tblPlot$medianSE_rez2,xlab="Number of Subjects", ylab="1/(median(SE))^2",cex.axis=2,cex=2,cex.lab=2,pch=21,bg="black")
-text(x=tblPlot$n_total, y=tblPlot$medianSE_rez2,labels=tblPlot$study,pos=3)
-abline(intercept,incline,col="red",lty=2)
-#dev.off()
-
-
-
-# get coeffcients of the linear model
-linearModel=lm("medianSE_rez2~n_total_sqrt",tblPlot)
-intercept=as.numeric(linearModel$coefficients[1])
-incline=as.numeric(linearModel$coefficients[2])
-
-#outfilename="Scatterplot_sqrtN_SE2.png"
-#png(outfilename,1000,1000)
-par(mar=(c(5,6,6,1)))
-plot(x=tblPlot$n_total_sqrt, y=tblPlot$medianSE_rez2,xlab="Sqrt(Number of Subjects)", ylab="1/(median(SE))^2",cex.axis=2,cex=2,cex.lab=2,pch=21,bg="black")
-text(x=tblPlot$n_total_sqrt, y=tblPlot$medianSE_rez2,labels=tblPlot$study,pos=3)
-abline(intercept,incline,col="red",lty=2)
-
-
-
-par(mar=(c(5,6,6,1)))
-plot(x=abs(tblPlot$medianBeta), y=tblPlot$medianSE, xlab="abs(median(beta))", ylab="median(SE)", cex.axis=2,cex=2,cex.lab=2,pch=21,bg="black")
-text(x=abs(tblPlot$medianBeta), y=tblPlot$medianSE, labels=tblPlot$study,pos=3)
+################################
+# MEDIAN(ABS(BETA))_MEDIAN(SE)_PLOT
+################################
+#par(mar=(c(5,6,6,1)))
+#plot(x=abs(tblPlot$medianBeta), y=tblPlot$medianSE, xlab="abs(median(beta))", ylab="median(SE)", cex.axis=2,cex=2,cex.lab=2,pch=21,bg="black")
+#text(x=abs(tblPlot$medianBeta), y=tblPlot$medianSE, labels=tblPlot$study,pos=3)
 
 
 dev.off()

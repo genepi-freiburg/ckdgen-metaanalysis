@@ -12,7 +12,7 @@ echo "Analysis name: $ANALYSISNAME"
 cat /shared/metaanalysis/scripts/metal-params.txt |
 	sed s/%ANALYSISNAME%/$ANALYSISNAME/ > $MYFILE
 
-for FN in `ls -1 input/*.gz`
+for FN in `ls -1 input_LQ/*.gz`
 do
 	echo "PROCESS $FN" >> $MYFILE
 done

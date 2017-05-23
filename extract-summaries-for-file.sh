@@ -27,8 +27,9 @@ BETA_MIN=`cat $QCTXT | grep "Effect size (beta)" -A 19 | grep "Min" | awk '{ pri
 BETA_MAX=`cat $QCTXT | grep "Effect size (beta)" -A 19 | grep "Max" | awk '{ print $4 }'`
 BETA_Q1=`cat $QCTXT | grep "Effect size (beta)" -A 19 | grep "25%" | awk '{ print $3 }'`
 BETA_Q3=`cat $QCTXT | grep "Effect size (beta)" -A 19 | grep "75%" | awk '{ print $3 }'`
+BETA_SKEW=`cat $QCTXT | grep "Effect size (beta)" -A 19 | grep "Skewness" | awk '{ print $3 }'`
 
->&2 echo "Beta: N = $BETA_N, mean = $BETA_MEAN, median = $BETA_MEDIAN, sd = $BETA_SD, min = $BETA_MIN, max = $BETA_MAX, q1 = $BETA_Q1, q3 = $BETA_Q3"
+>&2 echo "Beta: N = $BETA_N, mean = $BETA_MEAN, median = $BETA_MEDIAN, sd = $BETA_SD, min = $BETA_MIN, max = $BETA_MAX, q1 = $BETA_Q1, q3 = $BETA_Q3, Skewness = $BETA_SKEW"
 
 
 
@@ -41,8 +42,9 @@ SE_MIN=`cat $QCTXT | grep "Standard error (SE)" -A 19 | grep "Min" | awk '{ prin
 SE_MAX=`cat $QCTXT | grep "Standard error (SE)" -A 25 | grep "Max" | awk '{ print $4 }'`
 SE_Q1=`cat $QCTXT | grep "Standard error (SE)" -A 19 | grep "25%" | awk '{ print $3 }'`
 SE_Q3=`cat $QCTXT | grep "Standard error (SE)" -A 25 | grep "75%" | awk '{ print $3 }'`
+SE_SKEW=`cat $QCTXT | grep "Standard error (SE)" -A 25 | grep "Skewness" | awk '{ print $3 }'`
 
->&2 echo "SE: N = $SE_N, mean = $SE_MEAN, median = $SE_MEDIAN, sd = $SE_SD, min = $SE_MIN, max = $SE_MAX, q1 = $SE_Q1, q3 = $SE_Q3"
+>&2 echo "SE: N = $SE_N, mean = $SE_MEAN, median = $SE_MEDIAN, sd = $SE_SD, min = $SE_MIN, max = $SE_MAX, q1 = $SE_Q1, q3 = $SE_Q3, Skewness = $SE_SKEW"
 
 
 PVAL_N=`cat $QCTXT | grep "P-value (pval)" -A 10 | grep "N " | awk '{ print $3 }'`
@@ -105,6 +107,7 @@ echo -n "$BETA_MIN	"
 echo -n "$BETA_MAX	"
 echo -n "$BETA_Q1	"
 echo -n "$BETA_Q3	"
+echo -n "$BETA_SKEW	"
 
 echo -n "$SE_N	"
 echo -n "$SE_MEAN	"
@@ -114,6 +117,7 @@ echo -n "$SE_MIN	"
 echo -n "$SE_MAX	"
 echo -n "$SE_Q1	"
 echo -n "$SE_Q3	"
+echo -n "$SE_SKEW	"
 
 echo -n "$PVAL_N	"
 echo -n "$PVAL_MEAN	"
