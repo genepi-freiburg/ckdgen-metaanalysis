@@ -53,7 +53,7 @@ for (i in 1:nrow(input)) {
 	summaries_table = read.table(summary_file, h=T, sep="\t")
 	summary(summaries_table) # will fail if strange things happened
 
-	input[i, "FILE_NAME"] = gsub(".gwas", ".gwas.gz", input[i, "FILE_NAME"])
+	input[i, "FILE_NAME"] = gsub(".gwas$", ".gwas.gz", input[i, "FILE_NAME"])
 
 	summary_row_idx = which(summaries_table$File.Name == input[i, "FILE_NAME"])
 	if (length(summary_row_idx) == 0) {
@@ -112,10 +112,19 @@ source("/shared/metaanalysis/scripts/boxplot.with.outlier.label.r")
 ################################
 # N
 ################################
-par(mfrow = c(1, 2), oma=c(0,0,2,0))
+if (is_binary) {
+	par(mfrow = c(1, 3), oma=c(0,0,2,0))
+} else {
+	par(mfrow = c(1, 2), oma=c(0,0,2,0))
+}
 boxplot.with.outlier.label(d$N_TOTAL, d$STUDY_NAME, spread_text=F)
 boxplot.with.outlier.label(d$N_ROWS, d$STUDY_NAME, spread_text=F)
-title("n(participants), n(variants)", outer=T)
+if (is_binary) {
+	boxplot.with.outlier.label(d$CASE_COUNT, d$STUDY_NAME, spread_text=F)
+	title("n(participants), n(variants), n(cases)", outer=T)
+} else {
+	title("n(participants), n(variants)", outer=T)
+}
 
 ################################
 # BETA

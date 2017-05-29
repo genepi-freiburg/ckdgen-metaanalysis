@@ -31,16 +31,16 @@ rm *.gwas.gz
 cd $WD
 
 echo "=============================================="  | tee -a $LOG
+echo "Calculate Lambdas"  | tee -a $LOG
+echo "=============================================="  | tee -a $LOG
+
+$SCRIPTS/make_lambda_table.sh input_HQ lambdas_input_HQ.txt | tee -a $LOG
+
+echo "=============================================="  | tee -a $LOG
 echo "Collect summaries" | tee -a $LOG
 echo "==============================================" | tee -a $LOG
 
 $SCRIPTS/collect-summaries.sh | tee -a $LOG
 Rscript $SCRIPTS/generate-summaries.R | tee -a $LOG
-
-echo "=============================================="  | tee -a $LOG
-echo "Calculate Lambdas"  | tee -a $LOG
-echo "=============================================="  | tee -a $LOG
-
-$SCRIPTS/make_lambda_table.sh input_HQ lambdas_input_HQ.txt | tee -a $LOG
 
 echo "Done." | tee -a $LOG

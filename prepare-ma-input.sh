@@ -133,6 +133,9 @@ do
 				}
 				mac = 2 * maf * n;
 				n_eff = n * info;
+				if (n == "NA") {
+					n_eff = 999999; 
+				}
 				beta = $(betaCol+1);
 				marker = $(snpCol+1);
 				if (indelRemove == 1 && marker ~ /_I$/) {
