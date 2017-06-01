@@ -113,7 +113,7 @@ source("/shared/metaanalysis/scripts/boxplot.with.outlier.label.r")
 # N
 ################################
 if (is_binary) {
-	par(mfrow = c(1, 3), oma=c(0,0,2,0))
+	par(mfrow = c(1, 4), oma=c(0,0,2,0))
 } else {
 	par(mfrow = c(1, 2), oma=c(0,0,2,0))
 }
@@ -121,10 +121,18 @@ boxplot.with.outlier.label(d$N_TOTAL, d$STUDY_NAME, spread_text=F)
 boxplot.with.outlier.label(d$N_ROWS, d$STUDY_NAME, spread_text=F)
 if (is_binary) {
 	boxplot.with.outlier.label(d$CASE_COUNT, d$STUDY_NAME, spread_text=F)
-	title("n(participants), n(variants), n(cases)", outer=T)
+	abline(h=100, col="green")
+	boxplot.with.outlier.label(d$N_TOTAL-d$CASE_COUNT, d$STUDY_NAME, spread_text=F)
+	abline(h=100, col="green")
+	title("n(participants), n(variants), n(cases), n(controls)", outer=T, sub="green line: n=100")
 } else {
 	title("n(participants), n(variants)", outer=T)
 }
+
+par(mfrow = c(1, 1), oma=c(0,0,0,0))
+plot(d$N_TOTAL, d$N_ROWS, xlab="n(participants)", ylab="n(variants)", pch=21, bg="black")
+text(x=d$N_TOTAL, y=d$N_ROWS, labels=d$STUDY_NAME, pos=3, col="blue")
+title("n(participants) vs. n(variants)")
 
 ################################
 # BETA
@@ -141,14 +149,14 @@ title("beta (median/q1/q3/Skewness)", outer=T)
 ################################
 # SE
 ################################
-par(mfrow = c(1, 4), oma=c(0,0,2,0))
+par(mfrow = c(1, 3), oma=c(0,0,2,0))
 boxplot.with.outlier.label(d$SE_MEDIAN, d$STUDY_NAME, spread_text=F)
 #boxplot.with.outlier.label(d$SE_MEAN, d$STUDY_NAME, spread_text=F)
 #boxplot.with.outlier.label(d$SE_SD, d$STUDY_NAME, spread_text=F)
 boxplot.with.outlier.label(d$SE_Q1, d$STUDY_NAME, spread_text=F)
 boxplot.with.outlier.label(d$SE_Q3, d$STUDY_NAME, spread_text=F)
-boxplot.with.outlier.label(d$SE_Skewness, d$STUDY_NAME, spread_text=F)
-title("SE (median/q1/q3/skewness)", outer=T)
+#boxplot.with.outlier.label(d$SE_Skewness, d$STUDY_NAME, spread_text=F)
+title("SE (median/q1/q3)", outer=T)
 
 ################################
 # PVAL
@@ -186,15 +194,29 @@ title("IQ (median/mean/sd/q1/q3)", outer=T)
 ################################
 # Lambda
 ################################
-par(mfrow=c(1,1))
+#par(mfrow=c(1, 2))
+layout(matrix(c(1,2),1), c(1,6), c(1))
 boxplot.with.outlier.label(d$LAMBDA, d$STUDY_NAME, spread_text=F)
-title("Lambda", outer=T)
+#title("Lambda", outer=T)
+
+plot(d$N_TOTAL, d$LAMBDA, xlab="n(participants)", ylab="lambda", bg="black", pch=21)
+text(x=d$N_TOTAL, y=d$LAMBDA, labels=d$STUDY_NAME, pos=3, col="blue")
+title("n(participants) vs. lambda", outer=T)
+
+
+# reset
+layout(matrix(1,1),c(1),c(1))
 
 tblPlot=data.frame(
 	study=d$STUDY_NAME,
 	medianSE=d$SE_MEDIAN,
 	medianBeta=d$BETA_MEDIAN,
 	n_total=d$N_TOTAL)
+if (is_binary) {
+	tblPlot$Ncases = d$CASE_COUNT
+	tblPlot$Nctrls = tblPlot$n_total - tblPlot$Ncases
+	tblPlot$lambda = d$LAMBDA
+}
 
 tblPlot$medianSE_rez=(1/tblPlot$medianSE)
 tblPlot$medianSE_rez2=(tblPlot$medianSE_rez**2)
@@ -207,9 +229,33 @@ linearModel=lm("medianSE_rez~n_total_sqrt",tblPlot)
 intercept=as.numeric(linearModel$coefficients[1])
 incline=as.numeric(linearModel$coefficients[2])
 par(mar=(c(5,6,6,1)))
-plot(x=tblPlot$n_total_sqrt, y=tblPlot$medianSE_rez,xlab="Sqrt(Number of Subjects)", ylab="1/median(SE)",cex.axis=2,cex=2,cex.lab=2,pch=21,bg="black")
-text(x=tblPlot$n_total_sqrt, y=tblPlot$medianSE_rez,labels=tblPlot$study,pos=3)
+plot(x=tblPlot$n_total_sqrt, y=tblPlot$medianSE_rez, xlab="sqrt(n(participants))", ylab="1/median(SE)",
+     cex.axis=2, cex=2, cex.lab=2, pch=21, bg="black")
+text(x=tblPlot$n_total_sqrt, y=tblPlot$medianSE_rez, labels=tblPlot$study, pos=3)
 abline(intercept,incline,col="red",lty=2)
+
+if (is_binary) {
+	tblPlot$Neff = 4 / ((1/tblPlot$Ncases)+(1/tblPlot$Nctrls))
+	tblPlot$Neff_sqrt = sqrt(tblPlot$Neff)
+
+	linearModel=lm("medianSE_rez~Neff_sqrt",tblPlot)
+	intercept=as.numeric(linearModel$coefficients[1])
+	incline=as.numeric(linearModel$coefficients[2])
+	par(mar=(c(5,6,6,1)))
+	plot(x=tblPlot$Neff_sqrt, y=tblPlot$medianSE_rez, xlab="sqrt(Neff); Neff = 4/(1/n(cases) + 1/n(controls))", ylab="1/median(SE)",
+             cex.axis=2, cex=2, cex.lab=2, pch=21, bg="black")
+        text(x=tblPlot$Neff_sqrt, y=tblPlot$medianSE_rez, labels=tblPlot$study, pos=3)
+	abline(intercept, incline, col="red", lty=2)
+
+	plot(tblPlot$Neff, tblPlot$lambda, xlab="Neff = 4/(1/n(cases) + 1/n(controls))", ylab="lambda",
+             cex.axis=2, cex=2, cex.lab=2, pch=21, bg="black")
+        text(x=tblPlot$Neff, y=tblPlot$lambda, labels=tblPlot$study, pos=3)
+        linearModel=lm("lambda~Neff",tblPlot)
+        intercept=as.numeric(linearModel$coefficients[1])
+        incline=as.numeric(linearModel$coefficients[2])
+        abline(intercept, incline, col="red", lty=2)
+}
+
 
 ################################
 # 1/MEDIAN(SE)_N_PLOT

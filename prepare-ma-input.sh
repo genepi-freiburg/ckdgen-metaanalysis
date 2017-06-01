@@ -106,7 +106,9 @@ do
 		echo "COLUMN NAME PROBLEMS in file: $FN"
 		echo "SNP_COL=$SNP_COL CHR_COL=$CHR_COL POS_COL=$POS_COL REF_ALL_COL=$REF_ALL_COL CODED_ALL_COL=$CODED_ALL_COL"
 		echo "AF_COL=$AF_COL INFO_COL=$INFO_COL BETA_COL=$BETA_COL SE_COL=$SE_COL PVAL_COL=$PVAL_COL N_COL=$N_COL"
-		exit 3
+		#	exit 3
+		echo "SKIP FILE"
+		continue
 	fi
 
 	# filter file
@@ -135,6 +137,7 @@ do
 				n_eff = n * info;
 				if (n == "NA") {
 					n_eff = 999999; 
+					mac = 999999;
 				}
 				beta = $(betaCol+1);
 				marker = $(snpCol+1);
