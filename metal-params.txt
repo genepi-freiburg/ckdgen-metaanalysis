@@ -15,11 +15,17 @@ ADDFILTER Se > 0
 ADDFILTER chr < 23
 ADDFILTER AF_coded_all > 0
 ADDFILTER AF_coded_all < 1
+#ADDFILTER mac > 20
 
-CUSTOMVARIABLE n_total
-CUSTOMVARIABLE n_effective
-CUSTOMVARIABLE mac
-CUSTOMVARIABLE oevar_imp
+CUSTOMVARIABLE n_total_sum
+CUSTOMVARIABLE n_effective_sum
+CUSTOMVARIABLE mac_sum
+CUSTOMVARIABLE oevar_imp_sum
+
+LABEL n_total_sum AS n_total
+LABEL n_effective_sum AS n_effective
+LABEL mac_sum AS mac
+LABEL oevar_imp_sum AS oevar_imp
 
 OUTFILE output/%ANALYSISNAME% .tbl
 
