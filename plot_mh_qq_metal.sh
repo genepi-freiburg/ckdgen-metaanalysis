@@ -11,16 +11,18 @@ then
 	exit 3
 fi
 
-NSTUD="2"
+# default: rely on pre-filter
+NSTUD=""
 if [ "$2" != "" ]
 then
         NSTUD=$2
         echo "Use NSTUD filter from commandline: $NSTUD"
 else
-        echo "Use default NSTUD filter: $NSTUD"
+	NSTUD=99999
+        echo "Don't use NSTUD filter."
 fi
 
-OUT=${FN}_nstud${NSTUD}.epacts
+OUT=${FN}.epacts
 
 cat $FN | awk -v nstud_filter=$NSTUD '{ 
 	if (FNR > 1) {
@@ -42,3 +44,8 @@ cat $FN | awk -v nstud_filter=$NSTUD '{
 	} }' > ${OUT}
 
 /shared/metaanalysis/bin/EPACTS-3.2.6/bin/epacts-plot -in ${OUT}
+
+rm -f ${OUT}.conf
+rm -f ${OUT}.R
+rm -f ${OUT}.top5000
+
