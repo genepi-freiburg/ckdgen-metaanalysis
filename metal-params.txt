@@ -26,7 +26,7 @@ ADDFILTER AF_coded_all > 0
 ADDFILTER AF_coded_all < 1
 
 # !!!! maybe tweak this filter
-ADDFILTER mac > 20
+ADDFILTER mac > 10
 
 # custom (sum) variables
 CUSTOMVARIABLE n_total_sum
