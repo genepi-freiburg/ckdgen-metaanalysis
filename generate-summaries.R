@@ -28,6 +28,8 @@ if (nrow(input_paths) != nrow(input_files)) {
 }
 
 lambdas = read.table("lambdas_input_HQ.txt", h=T)
+lambdas$FILE = gsub(".gwas$", "", lambdas$FILE)
+lambdas$FILE = gsub(".gwas.gz$", "", lambdas$FILE)
 
 input = cbind(input_files, input_paths)
 summary(input)
@@ -40,7 +42,7 @@ for (i in 1:nrow(input)) {
 	segs = unlist(strsplit(fn, "/"))
 	parent_dir = paste(segs[1:(length(segs)-2)], collapse='/')
 	summary_file = "gwasqc_summaries.txt"
-	print(paste("summary file:", summary_file))
+#	print(paste("summary file:", summary_file))
 	if (!file.exists(summary_file)) {
 		print(paste("ERROR: summary file does not exist for study file:", input[i, "FILE_NAME"]))
 		stop()
@@ -52,8 +54,11 @@ for (i in 1:nrow(input)) {
 
 	summaries_table = read.table(summary_file, h=T, sep="\t")
 	summary(summaries_table) # will fail if strange things happened
+	summaries_table$File.Name = gsub(".gwas$", "", summaries_table$File.Name)
+	summaries_table$File.Name = gsub(".gwas.gz$", "", summaries_table$File.Name)
 
-	input[i, "FILE_NAME"] = gsub(".gwas$", ".gwas.gz", input[i, "FILE_NAME"])
+	input[i, "FILE_NAME"] = gsub(".gwas$", "", input[i, "FILE_NAME"])
+	input[i, "FILE_NAME"] = gsub(".gwas.gz$", "", input[i, "FILE_NAME"])
 
 	summary_row_idx = which(summaries_table$File.Name == input[i, "FILE_NAME"])
 	if (length(summary_row_idx) == 0) {
