@@ -1,8 +1,8 @@
 #!/bin/bash
 
-LOG=04-generate-summaries.log
 SCRIPTS=/shared/metaanalysis/scripts
 WD=`pwd`
+LOG=$WD/04-generate-summaries.log
 
 rm -rf gwasqc
 mkdir gwasqc
@@ -26,9 +26,16 @@ echo "=============================================="  | tee -a $LOG
 echo "Run GWASQC" | tee -a $LOG
 echo "==============================================" | tee -a $LOG
 
-Rscript gwasqc.R | tee -a $LOG
+Rscript gwasqc.R 2>&1 | tee -a $LOG
+RC="$?"
 rm *.gwas.gz
 cd $WD
+
+if [ "$RC" -ne 0 ]
+then
+	echo "GWASQC problems!!"
+	exit 3
+fi
 
 echo "=============================================="  | tee -a $LOG
 echo "Calculate Lambdas"  | tee -a $LOG
