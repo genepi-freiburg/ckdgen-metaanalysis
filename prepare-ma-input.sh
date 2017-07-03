@@ -1,8 +1,8 @@
 #!/bin/bash
 
-if [[ "$#" -lt "7" ]] || [[ "$#" -gt "8" ]]
+if [[ "$#" -lt "7" ]] || [[ "$#" -gt "9" ]]
 then
-	echo "Usage: $0 <INPUT_FILE_LIST> <MAF_FILTER> <INFO_FILTER> <MAC_FILTER> <EFF_SAMPLE_SIZE> <BETA_FILTER> <INDEL_REMOVAL> [<OUTDIR>]"
+	echo "Usage: $0 <INPUT_FILE_LIST> <MAF_FILTER> <INFO_FILTER> <MAC_FILTER> <EFF_SAMPLE_SIZE> <BETA_FILTER> <INDEL_REMOVAL> [<OUTDIR> [<SKIPEXIST>]]"
 	exit 3
 fi
 
@@ -14,6 +14,7 @@ EFF_SAMPLE_SIZE=$5
 BETA_FILTER=$6
 INDEL_REMOVAL=$7
 OUTDIR=$8
+SKIP_EXIST=$9
 
 if [ ! -f "$INPUT_FILE_LIST" ]
 then
@@ -114,6 +115,17 @@ do
 	# filter file
 	OUTFN=`basename $FN`
 	echo "Process $FN ==> $OUTDIR/$OUTFN"
+
+	if [ -f "$OUTDIR/$OUTFN" ]
+	then
+		echo "Output file exists!"
+		if [ "$SKIP_EXIST" == "1" ]
+		then
+			echo "Skip file!"
+			continue
+		fi
+	fi
+
 	zcat $FN | awk -v mafFilter=$MAF_FILTER -v infoFilter=$INFO_FILTER -v macFilter=$MAC_FILTER -v effFilter=$EFF_SAMPLE_SIZE -v betaFilter=$BETA_FILTER \
 		-v indelRemove=$INDEL_REMOVAL \
 		-v snpCol=$SNP_COL -v chrCol=$CHR_COL -v posCol=$POS_COL -v refAllCol=$REF_ALL_COL -v codedAllCol=$CODED_ALL_COL \
@@ -127,7 +139,7 @@ do
 			if (FNR > 1) {
 				af = $(afCol+1);
 				n = $(nCol+1);
-				info = $(infoCol+1);
+				info = $(infoCol+1) + 0;
 				if (af > 0.5) {
 					maf = 1-af;
 				} else {
