@@ -11,7 +11,7 @@ then
 	exit 3
 fi
 
-NSTUD="2"
+NSTUD="0"
 if [ "$2" != "" ]
 then
 	NSTUD=$2
