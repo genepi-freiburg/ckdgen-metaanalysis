@@ -18,11 +18,20 @@ then
         NSTUD=$2
         echo "Use NSTUD filter from commandline: $NSTUD"
 else
-	NSTUD=99999
+	NSTUD=0
         echo "Don't use NSTUD filter."
 fi
 
+REGIONS=""
+if [ "$3" != "" ]
+then
+	REGIONS="$3"
+	echo "Use 'regions' file: $REGIONS"
+fi
+
 OUT=${FN}.epacts
+
+echo "Convert to EPACTS: $FN -> $OUT"
 
 cat $FN | awk -v nstud_filter=$NSTUD '{ 
 	if (FNR > 1) {
@@ -43,7 +52,14 @@ cat $FN | awk -v nstud_filter=$NSTUD '{
 		print "#CHR", "BEGIN", "END", "MAF", "PVALUE";
 	} }' > ${OUT}
 
-/shared/metaanalysis/bin/EPACTS-3.2.6/bin/epacts-plot -in ${OUT}
+if [ "$REGIONS" != "" ]
+then
+	echo "Invoke epacts-plot with $OUT and regions file $REGIONS"
+	/shared/metaanalysis/bin/EPACTS-3.2.6/bin/epacts-plot -in ${OUT} -regionf ${REGIONS}
+else
+	echo "Invoke epacts-plot with $OUT"
+	/shared/metaanalysis/bin/EPACTS-3.2.6/bin/epacts-plot -in ${OUT}
+fi
 
 rm -f ${OUT}.conf
 rm -f ${OUT}.R
