@@ -1,3 +1,11 @@
+summary_file = "gwasqc_summaries.txt"
+
+args = commandArgs(trailingOnly=T)
+if (length(args) > 0) {
+	summary_file = args[1]
+}
+print(paste("Using summary file:", summary_file))
+
 input_files = read.table("input-file-list.txt", h=F)
 
 if (ncol(input_files) == 2) {
@@ -41,7 +49,6 @@ for (i in 1:nrow(input)) {
 	print(paste("process", i, fn))
 	segs = unlist(strsplit(fn, "/"))
 	parent_dir = paste(segs[1:(length(segs)-2)], collapse='/')
-	summary_file = "gwasqc_summaries.txt"
 #	print(paste("summary file:", summary_file))
 	if (!file.exists(summary_file)) {
 		print(paste("ERROR: summary file does not exist for study file:", input[i, "FILE_NAME"]))
