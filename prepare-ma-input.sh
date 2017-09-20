@@ -156,8 +156,10 @@ do
 				if (indelRemove == 1 && marker ~ /_I$/) {
 					next;
 				}
+				se = $(seCol+1);
+				pval = $(pvalCol+1);
 				if (beta > -betaFilter && beta < betaFilter && maf >= mafFilter &&
-				    info >= infoFilter && mac >= macFilter && n_eff >= effFilter) {
+				    info >= infoFilter && mac >= macFilter && n_eff >= effFilter && se >= 0 && pval >= 0 && se != "NA" && se != "Inf" && pval != "Inf" && pval != "NA") {
 					print marker, $(chrCol+1), $(posCol+1), $(codedAllCol+1), $(refAllCol+1),
 					      af, maf, mac, n, n_eff, info, beta, $(seCol+1), $(pvalCol+1);
 				}
